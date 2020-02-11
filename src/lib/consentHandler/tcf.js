@@ -3,6 +3,7 @@ export const TCF_RETURN_MSG = "__tcfapiReturn";
 export const TCF_GET_MSG = "__tcfapiCall";
 export const TCF_FRAME = "__tcfapiLocator";
 export const TCF_API = '__tcfapi';
+export const TCF_API_VERSION = 2;
 
 /**
  * Helper to determine GDPR consents.
@@ -23,7 +24,7 @@ export default class Tcf {
     }
 
     getConsentCmd(){
-        return [[TCF_GET_DATA]];
+        return [[TCF_GET_DATA, TCF_API_VERSION]];
     }
 
     getConsentData(result){

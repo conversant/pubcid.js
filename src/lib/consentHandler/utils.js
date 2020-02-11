@@ -56,7 +56,7 @@ export function sendCmpRequests(proxy, requests, callback, timeout=30000) {
                     resolve(result);
                 }
                 else
-                    reject(Error('Consent request ' + req['command'] + " failed"));
+                    reject(Error('Consent request ' + req + " failed"));
             });
         }));
     });

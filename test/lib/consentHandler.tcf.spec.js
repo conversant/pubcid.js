@@ -1,19 +1,41 @@
 import {expect} from 'chai';
 import ConsentHandler from "../../src/lib/consentHandler/consentHandler";
-
-const CMP_CALL     = "__tcfapi";
-const CMP_GET_CMD  = "getTCData";
+import {TCF_API, TCF_API_VERSION, TCF_GET_DATA} from "../../src/lib/consentHandler/tcf";
 
 const sampleTCData = {
     'gdprApplies': true,
     'tcString': '12345_67890'
 };
+
+function mockCmp(cmd, version, callback){
+    if (cmd === TCF_GET_DATA && version === TCF_API_VERSION) {
+        callback(sampleTCData);
+    }
+}
 describe('Tcf', () => {
     describe('iab', () => {
         const empty = {gdpr: null, gdpr_consent: null, hasSiteConsent: true};
         afterEach(() => {
-            if (window[CMP_CALL])
-                delete window[CMP_CALL];
+            if (window[TCF_API])
+                delete window[TCF_API];
+        });
+
+        it('test consentHandler', ()=>{
+            let driver;
+            const consentConfig = {
+                type: 'iab',
+                timeout: 100
+            };
+            window[TCF_API] = mockCmp;
+
+            const consentUtils = new ConsentHandler(consentConfig);
+            [driver] = consentUtils.getProxy();
+            const requests = driver.getConsentCmd();
+            expect(requests.length).equals(1);
+            requests.forEach((req)=>{
+                expect(req[0]).equals(TCF_GET_DATA);
+                expect(req[1]).equals(TCF_API_VERSION);
+            })
         });
 
         it('call cmp', (done) => {
@@ -22,11 +44,7 @@ describe('Tcf', () => {
                 timeout: 100
             };
 
-            window[CMP_CALL] = (cmd, arg, callback) => {
-                if (cmd === CMP_GET_CMD) {
-                    callback(sampleTCData);
-                }
-            };
+            window[TCF_API] = mockCmp;
 
             const consentUtils = new ConsentHandler(consentConfig);
             consentUtils.checkConsent((resp,success) => {
