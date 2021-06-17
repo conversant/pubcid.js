@@ -11,13 +11,15 @@ describe('Standalone pubcid default', ()=>{
     }
 
     after(()=>{
-        window.PublisherCommonId = undefined;
+        delete window.PublisherCommonId;
+        delete window[CMP_CALL];
         clearAllCookies();
         window.localStorage.clear();
     });
 
     beforeEach(()=>{
-        window.PublisherCommonId = undefined;
+        delete window.PublisherCommonId;
+        delete window[CMP_CALL];
         clearAllCookies();
         window.localStorage.clear();
     });
@@ -77,5 +79,80 @@ describe('Standalone pubcid default', ()=>{
         }).then((pubcid) => {
             expect(pubcid).to.equal('');
         });
+    });
+
+    it('pushed getIdWithConsent before setup', (done)=>{
+        window.PublisherCommonId = {que: []};
+        window.PublisherCommonId.que.push(['getIdWithConsent', function(pubcid) {
+            expect(pubcid).to.match(uuidPattern);
+            done();
+        }])
+        setupPubcid(window, document, {});
+    });
+
+    it('pushed getIdWithConsent after setup', (done)=>{
+        window.PublisherCommonId = {que: []};
+        setupPubcid(window, document, {});
+        window.PublisherCommonId.que.push(['getIdWithConsent', function(pubcid) {
+            expect(pubcid).to.match(uuidPattern);
+            done();
+        }])
+    });
+
+    it('pushed function before setup', (done)=>{
+        window.PublisherCommonId = {que: []};
+        window.PublisherCommonId.que.push(function() {
+            window.PublisherCommonId.getIdWithConsent(function(pubcid) {
+                expect(pubcid).to.match(uuidPattern);
+                done();
+            });
+        })
+        setupPubcid(window, document, {});
+    });
+
+    it('pushed function after setup', (done)=>{
+        window.PublisherCommonId = {que: []};
+        setupPubcid(window, document, {});
+        window.PublisherCommonId.que.push(function() {
+            window.PublisherCommonId.getIdWithConsent(function(pubcid) {
+                expect(pubcid).to.match(uuidPattern);
+                done();
+            });
+        })
+    });
+
+    it('pushed function before setup no consent', (done)=>{
+        window[CMP_CALL] = (cmd, args, callback) => {
+            callback(mockResult(false), true);
+        };
+        window.PublisherCommonId = {que: []};
+        window.PublisherCommonId.que.push(function() {
+            window.PublisherCommonId.getIdWithConsent(function(pubcid) {
+                expect(pubcid).to.be.null;
+                done();
+            });
+        })
+        setupPubcid(window, document, {});
+    });
+
+    it('createId', ()=>{
+        setupPubcid(window, document, {autoinit: false});
+        let pubcid = PublisherCommonId.getId();
+        expect(pubcid).to.equal('');
+        window.PublisherCommonId.createId();
+        pubcid = PublisherCommonId.getId();
+        expect(pubcid).to.match(uuidPattern);
+    });
+
+    it('updateIdWithConsent', (done)=>{
+        setupPubcid(window, document, {autoinit: false});
+        let pubcid = PublisherCommonId.getId();
+        expect(pubcid).to.equal('');
+        window.PublisherCommonId.updateIdWithConsent(
+            function(id) {
+                expect(id).to.match(uuidPattern);
+                done();
+            }
+        );
     });
 });
