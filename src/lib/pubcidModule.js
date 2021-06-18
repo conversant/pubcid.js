@@ -1,5 +1,6 @@
 import PubcidHandler from './pubcidHandler';
-import {uuid4} from "./utils";
+import {uuid4} from './utils';
+import log from 'loglevel'
 
 /**
  * Create a window level PublisherCommonId object that sets and returns pubcid.
@@ -23,9 +24,14 @@ export function setupPubcid(win, doc, options = {}) {
             const params = [].slice.call(args);  // convert to a proper array
             const method = params.shift();       // separate method name from the rest
             if (typeof delegate[method] === 'function') {
+                log.debug(`Processing command: ${method}`)
                 delegate[method].apply(delegate, params);
             }
+            else {
+                log.warn(`Skipped unrecognized command: ${method}`);
+            }
         } else {
+            log.debug('Processing anonymous function');
             args();
         }
     }
