@@ -1,6 +1,7 @@
 import PubcidHandler from './pubcidHandler';
 import {uuid4} from './utils';
 import log from 'loglevel'
+import {initPubcidStub} from "./stub";
 
 /**
  * Create a window level PublisherCommonId object that sets and returns pubcid.
@@ -103,6 +104,7 @@ export function setupPubcid(win, doc, options = {}) {
     };
 
     /* --- Queue and global object initialization --- */
+    initPubcidStub(_handler);
 
     if (options.autoinit === undefined || options.autoinit)
         delegate.init();
