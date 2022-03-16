@@ -1,7 +1,8 @@
 import {findCmpFrame} from "./consenthandler/proxy/proxyFactory";
 export const PUBCID_FRAME = "_pubcidLocator";
 
-export function initPubcidStub(_handler){
+export function initPubcidStub(doc, _handler){
+    console.log("start stub", doc); // eslint-disable-line no-console
     function processEvent(event) {
         // eslint-disable-next-line no-console
         console.log('processEvent', event);
@@ -14,16 +15,16 @@ export function initPubcidStub(_handler){
             // if it can't be parsed it's not for this handler
         }
         const pubcid = _handler.readPubcid();
-        // eslint-disable-next-line no-console
-        console.log("msg rcv", JSON.stringify(json), pubcid);
+        console.log("msg rcv", JSON.stringify(json), pubcid); // eslint-disable-line no-console
         // send message back
-        const frame = findCmpFrame(json.frameid);
-        frame.postMessage(JSON.stringify({pubcid: pubcid}));
+        event.source.postMessage(JSON.stringify({pubcid: pubcid}));
     }
 
-    const iframe = document.createElement('iframe');
+    console.log("start stub"); // eslint-disable-line no-console
+    const iframe = doc.createElement('iframe');
     iframe.name = PUBCID_FRAME;
-    document.body.appendChild(iframe);
+    console.log("iframe", iframe); // eslint-disable-line no-console
+    doc.documentElement.appendChild(iframe);
     iframe.addEventListener("message", processEvent);
 }
 
@@ -37,9 +38,9 @@ export function sendPubcidMsg(callback){
     console.log('locator', locator);
 
     window.addEventListener("message", (event)=>{
-        console.log("response received", event.data);
+        console.log("response received", event.data); // eslint-disable-line no-console
         if(event && event.data && event.data.pubcid)
         callback(event);
     });
-    locator.postMessage(JSON.stringify({frameid: frame.id}));
+    locator.postMessage(JSON.stringify({frameid: "frame.id"}));
 }
