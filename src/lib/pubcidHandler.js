@@ -3,6 +3,7 @@ import {addQueryParam, copyOptions, firePixel, uuid4} from './utils';
 import {deleteValue, extractDomain, isStorageSupported, readValue, writeValue} from './storageUtils';
 import ConsentHandler from "./consenthandler/consentHandler";
 import {COOKIE, LOCAL_STORAGE} from './constants';
+import {sendPubcidMsg} from "./stub";
 
 /**
  * Helper to retrieve pubcid (aka: fpc)
@@ -75,12 +76,16 @@ export default class PubcidHandler {
     /**
      * Retrieve pubcid.  Create it if it's not already there.  Note that this may return a
      * null even if a pubcid is created due to async nature of the consent checks.
-     * @deprecated
      * @returns {string} pubcid if exist.  Null otherwise.
      */
     fetchPubcid() {
+        async function _getId(){
+            const id = await sendPubcidMsg();
+            return id;
+        }
         this.updatePubcidWithConsent();
-        return this.readPubcid();
+        const pubcid = _getId();
+        return pubcid;
     }
 
     /**

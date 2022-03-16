@@ -16,12 +16,9 @@ describe('Pubcid stub', ()=>{
     });
     after(()=>{ cookie.delCookie('_pubcid'); });
 
-    it('send receive message', ()=>{
-        initPubcidStub(handler);
-        return sendPubcidMsg((event) =>{
-            // eslint-disable-next-line no-console
-            console.log('rcv msg', JSON.stringify(event));
-            expect(event).equals("{pubcid: 'pubcid value'}");
-        })
+    it('send receive message', async ()=>{
+        initPubcidStub(document, handler);
+        const result = await sendPubcidMsg();
+        expect(result).equals("{pubcid: 'pubcid value'}");
     });
 });

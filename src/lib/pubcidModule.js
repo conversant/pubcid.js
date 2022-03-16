@@ -94,6 +94,11 @@ export function setupPubcid(win, doc, options = {}) {
         _handler.updatePubcidWithConsent(callback);
     };
 
+    delegate.fetchPubcid = function(){
+        const result = _handler.fetchPubcid();
+        return result;
+    };
+
     /**
      * Return the pubcid via the callback if there is consent.  Otherwise
      * pass null to the callback.
@@ -104,7 +109,7 @@ export function setupPubcid(win, doc, options = {}) {
     };
 
     /* --- Queue and global object initialization --- */
-    initPubcidStub(_handler);
+    initPubcidStub(doc, _handler);
 
     if (options.autoinit === undefined || options.autoinit)
         delegate.init();
