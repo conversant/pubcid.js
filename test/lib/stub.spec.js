@@ -8,17 +8,20 @@ import {initPubcidStub, sendPubcidMsg} from "../../src/lib/stub";
 chai.use(sinonChai);
 const expect = chai.expect;
 
-describe('Pubcid stub', ()=>{
+describe.only('Pubcid stub', ()=>{
     let handler;
     before(()=>{
         handler = new PubcidHandler();
         cookie.setCookie('_pubcid', 'pubcid value');
     });
-    after(()=>{ cookie.delCookie('_pubcid'); });
+    after(
+        // TODO: clean up both listeners
+        ()=>{ cookie.delCookie('_pubcid'); }
+    );
 
     it('send receive message', async ()=>{
         initPubcidStub(document, handler);
         const result = await sendPubcidMsg();
-        expect(result).equals("{pubcid: 'pubcid value'}");
+        expect(result).equals(JSON.stringify({pubcid: 'pubcid value'}));
     });
 });
